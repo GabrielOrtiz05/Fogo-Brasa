@@ -1,0 +1,103 @@
+:root {
+    --bg-dark: #121212;
+    --card-bg: #1e1e1e;
+    --primary-orange: #ff6600;
+    --text-light: #f4f4f4;
+    --text-gray: #b3b3b3;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+.dashboard-header {
+    background: #0a0a0a;
+    padding: 15px 0;
+    border-bottom: 2px solid var(--primary-orange);
+}
+
+.header-flex { display: flex; justify-content: space-between; align-items: center; }
+
+.logo { font-size: 1.5rem; text-decoration: none; color: white; }
+.logo span { color: var(--primary-orange); }
+
+.btn-logout {
+    background: transparent;
+    border: 1px solid var(--primary-orange);
+    color: var(--primary-orange);
+    padding: 5px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.dashboard-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.item-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #333;
+}
+
+.btn-add {
+    background: var(--primary-orange);
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.order-summary {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 10px;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.total-box {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.btn-primary {
+    width: 100%;
+    background: var(--primary-orange);
+    color: white;
+    border: none;
+    padding: 12px;
+    margin-top: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary:disabled { background: #555; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+    .dashboard-main { grid-template-columns: 1fr; }
+}

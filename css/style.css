@@ -119,7 +119,34 @@ header {
     margin-left: auto;
     margin-right: auto;
 }
+.user-name {
+    color: var(--primary-orange);
+    font-weight: 600;
+    margin-right: 10px;
+}
 
+.btn-auth {
+    background-color: var(--primary-orange);
+    color: white !important;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-auth:hover {
+    background-color: var(--orange-hover);
+}
+
+.btn-logout-small {
+    background: transparent;
+    border: 1px solid #555;
+    color: var(--text-gray);
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 4px;
+}
 .btn-primary {
     background-color: var(--primary-orange);
     color: #fff;

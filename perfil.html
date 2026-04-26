@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Pedido - Fogo & Brasa</title>
+    <link rel="stylesheet" href="/css/perfil-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="dashboard-header">
+        <div class="container header-flex">
+            <h1 class="logo">Fogo<span>&</span>Brasa</h1>
+            <div class="user-info">
+                <span id="boas-vindas">Carregando perfil...</span>
+                <button onclick="logout()" class="btn-logout">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container dashboard-main">
+        <section class="menu-section">
+            <h2>Cardápio de Cortes</h2>
+            <div class="menu-grid">
+                <div class="item-card">
+                    <div class="item-info">
+                        <h3>Picanha Premium</h3>
+                        <p>R$ 89,90</p>
+                    </div>
+                    <button onclick="adicionarAoPedido('Picanha Premium', 89.90)" class="btn-add">+</button>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h3>Costela Fogo de Chão</h3>
+                        <p>R$ 75,00</p>
+                    </div>
+                    <button onclick="adicionarAoPedido('Costela Fogo de Chão', 75.00)" class="btn-add">+</button>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h3>Bife de Ancho</h3>
+                        <p>R$ 95,00</p>
+                    </div>
+                    <button onclick="adicionarAoPedido('Bife de Ancho', 95.00)" class="btn-add">+</button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="order-summary">
+            <h3>Seu Pedido</h3>
+            <ul id="lista-pedido">
+                <p class="empty-msg">Nenhum item selecionado</p>
+            </ul>
+            <div class="total-box">
+                <span>Total:</span>
+                <span id="valor-total">R$ 0,00</span>
+            </div>
+            <button id="btn-finalizar" onclick="finalizarPedido()" class="btn-primary" disabled>Finalizar Pedido</button>
+        </aside>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/script/perfil-script.js"></script>
+</body>
+</html>

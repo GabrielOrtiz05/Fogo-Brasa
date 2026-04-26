@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Fogo & Brasa</title>
+    <link rel="stylesheet" href="/css/login-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Fogo<span>&</span>Brasa</h2>
+                <p>Crie sua conta para fazer reservas</p>
+            </div>
+            
+            <form id="cadastroForm">
+                <div class="input-group">
+                    <label for="nome">Nome Completo</label>
+                    <input type="text" id="nome" placeholder="Digite seu nome" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" placeholder="Digite seu e-mail" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" placeholder="Crie uma senha forte" required minlength="6">
+                </div>
+
+                <div class="input-group">
+                    <label for="confirmarSenha">Confirmar Senha</label>
+                    <input type="password" id="confirmarSenha" placeholder="Repita a senha" required minlength="6">
+                </div>
+                
+                <button type="submit" class="btn-login">Cadastrar</button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Já tem uma conta? <a href="login.html">Entrar</a></p>
+                <a href="index.html" class="back-home">← Voltar para o Início</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/script/cadastro-script.js"></script>
+</body>
+</html>

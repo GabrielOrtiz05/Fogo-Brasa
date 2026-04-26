@@ -12,14 +12,17 @@
     <header>
         <div class="container header-container">
             <a href="#" class="logo">Fogo<span>&</span>Brasa</a>
+            
             <nav class="nav-menu">
-                <ul class="nav-list">
+                <ul class="nav-list" id="nav-links">
                     <li><a href="#home">Início</a></li>
                     <li><a href="#cardapio">Cardápio</a></li>
                     <li><a href="#sobre">Sobre Nós</a></li>
                     <li><a href="#contato">Contato</a></li>
+                    <li id="auth-area"></li> 
                 </ul>
             </nav>
+
             <div class="menu-toggle" id="mobile-menu">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -32,7 +35,7 @@
         <div class="hero-content">
             <h1>A Verdadeira Experiência do Churrasco</h1>
             <p>Cortes premium, assados na brasa com a tradição e o sabor que você merece.</p>
-            <button class="btn-primary" onclick="fazerReserva()">Reserve sua Mesa</button>
+            <a href="perfil.html" class="btn-primary" style="text-decoration: none; display: inline-block;">Reserve sua Mesa</a>
         </div>
     </section>
 
@@ -57,7 +60,7 @@
                 <div class="card-img placeholder-ancho"></div>
                 <div class="card-content">
                     <h3>Bife Ancho</h3>
-                    <p>Corte argentino com marmoreio excepcional e sabor intenso.</p>
+                    <p>Corte argentino com marmoreio excecional e sabor intenso.</p>
                 </div>
             </div>
         </div>
@@ -79,6 +82,7 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/script/script.js"></script>
 </body>
 </html>
