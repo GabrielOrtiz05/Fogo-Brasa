@@ -95,6 +95,27 @@ body {
     cursor: pointer;
     font-weight: bold;
 }
+/* Botão de Retorno Laranja */
+.btn-return {
+    display: block;
+    width: 100%;
+    background-color: transparent; /* Fundo transparente */
+    color: var(--primary-orange);
+    border: 2px solid var(--primary-orange); /* Borda laranja */
+    padding: 12px;
+    margin-top: 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-return:hover {
+    background-color: var(--primary-orange); /* Fica todo laranja ao passar o mouse */
+    color: white;
+}
 
 .btn-primary:disabled { background: #555; cursor: not-allowed; }
 

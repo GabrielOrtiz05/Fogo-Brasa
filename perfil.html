@@ -11,8 +11,11 @@
 
     <header class="dashboard-header">
         <div class="container header-flex">
-            <h1 class="logo">Fogo<span>&</span>Brasa</h1>
-            <div class="user-info">
+            <a href="index.html" class="logo" style="text-decoration: none;">Fogo<span>&</span>Brasa</a>
+            
+            <div class="user-info" style="display: flex; align-items: center; gap: 15px;">
+                <a href="index.html" style="color: var(--text-gray); text-decoration: none; font-size: 0.9rem; transition: 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--text-gray)'">← Início</a>
+                
                 <span id="boas-vindas">Carregando perfil...</span>
                 <button onclick="logout()" class="btn-logout">Sair</button>
             </div>
@@ -46,8 +49,7 @@
                 </div>
             </div>
         </section>
-
-        <aside class="order-summary">
+<aside class="order-summary">
             <h3>Seu Pedido</h3>
             <ul id="lista-pedido">
                 <p class="empty-msg">Nenhum item selecionado</p>
@@ -57,6 +59,8 @@
                 <span id="valor-total">R$ 0,00</span>
             </div>
             <button id="btn-finalizar" onclick="finalizarPedido()" class="btn-primary" disabled>Finalizar Pedido</button>
+            
+            <a href="index.html" class="btn-return">Voltar para o Início</a>
         </aside>
     </main>
 
