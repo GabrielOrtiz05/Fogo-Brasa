@@ -84,16 +84,48 @@ body {
     font-size: 1.2rem;
 }
 
-.btn-primary {
+/* Base unificada para os dois botões terem exatos mesmos tamanhos */
+.btn-primary, .btn-return {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
+    height: 50px; /* Altura fixa para garantir 100% de igualdade */
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif; /* Forçando a fonte em ambos */
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0; /* Removendo padding para a altura fixa assumir o controle */
+}
+
+/* Estilo específico do botão Finalizar */
+.btn-primary {
     background: var(--primary-orange);
     color: white;
-    border: none;
-    padding: 12px;
+    border: 2px solid var(--primary-orange);
     margin-top: 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
+}
+
+.btn-primary:disabled { 
+    background: #555; 
+    border-color: #555;
+    cursor: not-allowed; 
+}
+
+/* Estilo específico do botão Voltar */
+.btn-return {
+    background: transparent;
+    color: var(--primary-orange);
+    border: 2px solid var(--primary-orange);
+    margin-top: 15px;
+}
+
+.btn-return:hover {
+    background: var(--primary-orange);
+    color: white;
 }
 /* Botão de Retorno Laranja */
 .btn-return {
