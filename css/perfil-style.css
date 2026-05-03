@@ -1,3 +1,6 @@
+/* =========================================
+   VARIÁVEIS E CONFIGURAÇÕES GERAIS
+========================================= */
 :root {
     --bg-dark: #121212;
     --card-bg: #1e1e1e;
@@ -6,25 +9,48 @@
     --text-gray: #b3b3b3;
 }
 
+* {
+    box-sizing: border-box; /* Garante que bordas e paddings não quebrem o tamanho dos itens */
+    margin: 0;
+    padding: 0;
+}
+
 body {
     background-color: var(--bg-dark);
     color: var(--text-light);
     font-family: 'Poppins', sans-serif;
-    margin: 0;
 }
 
-.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.container { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    padding: 0 20px; 
+}
 
+/* =========================================
+   CABEÇALHO (HEADER)
+========================================= */
 .dashboard-header {
     background: #0a0a0a;
     padding: 15px 0;
     border-bottom: 2px solid var(--primary-orange);
 }
 
-.header-flex { display: flex; justify-content: space-between; align-items: center; }
+.header-flex { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
 
-.logo { font-size: 1.5rem; text-decoration: none; color: white; }
-.logo span { color: var(--primary-orange); }
+.logo { 
+    font-size: 1.5rem; 
+    font-weight: bold;
+    color: white; 
+}
+
+.logo span { 
+    color: var(--primary-orange); 
+}
 
 .btn-logout {
     background: transparent;
@@ -33,14 +59,37 @@ body {
     padding: 5px 15px;
     border-radius: 4px;
     cursor: pointer;
-    margin-left: 15px;
+    font-family: 'Poppins', sans-serif;
+    transition: 0.3s;
 }
 
+.btn-logout:hover {
+    background: var(--primary-orange);
+    color: white;
+}
+
+/* =========================================
+   LAYOUT PRINCIPAL (GRID)
+========================================= */
 .dashboard-main {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 2fr 1fr; /* Esquerda ocupa 2 partes, Direita ocupa 1 */
     gap: 30px;
     margin-top: 40px;
+    margin-bottom: 50px;
+}
+
+.left-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================
+   CARDÁPIO E ITENS
+========================================= */
+.menu-section h2 {
+    margin-bottom: 20px;
+    color: var(--primary-orange);
 }
 
 .item-card {
@@ -54,6 +103,15 @@ body {
     border: 1px solid #333;
 }
 
+.item-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.item-info p {
+    color: var(--text-gray);
+}
+
 .btn-add {
     background: var(--primary-orange);
     border: none;
@@ -63,8 +121,16 @@ body {
     border-radius: 50%;
     font-size: 1.5rem;
     cursor: pointer;
+    transition: 0.2s;
 }
 
+.btn-add:hover {
+    transform: scale(1.1);
+}
+
+/* =========================================
+   CARRINHO E RESUMO DO PEDIDO
+========================================= */
 .order-summary {
     background: var(--card-bg);
     padding: 25px;
@@ -72,36 +138,60 @@ body {
     height: fit-content;
     position: sticky;
     top: 20px;
+    border: 1px solid #333;
+}
+
+.order-summary h3 {
+    margin-bottom: 15px;
+    color: var(--primary-orange);
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+#lista-pedido {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+#lista-pedido li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #444;
+    font-size: 0.95rem;
+}
+
+.empty-msg {
+    color: var(--text-gray);
+    font-style: italic;
+    font-size: 0.9rem;
 }
 
 .total-box {
-    margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px solid #444;
     display: flex;
     justify-content: space-between;
     font-weight: bold;
     font-size: 1.2rem;
 }
 
-/* Base unificada para os dois botões terem exatos mesmos tamanhos */
+/* =========================================
+   BOTÕES DO CARRINHO (PADRONIZADOS)
+========================================= */
 .btn-primary, .btn-return {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 50px; /* Altura fixa para garantir 100% de igualdade */
+    height: 50px; /* Altura fixa garante botões gêmeos */
     font-size: 1rem;
-    font-family: 'Poppins', sans-serif; /* Forçando a fonte em ambos */
+    font-family: 'Poppins', sans-serif;
     font-weight: bold;
     border-radius: 5px;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    padding: 0; /* Removendo padding para a altura fixa assumir o controle */
 }
 
-/* Estilo específico do botão Finalizar */
+/* Botão de Finalizar */
 .btn-primary {
     background: var(--primary-orange);
     color: white;
@@ -110,12 +200,13 @@ body {
 }
 
 .btn-primary:disabled { 
-    background: #555; 
-    border-color: #555;
+    background: #444; 
+    color: #888;
+    border-color: #444;
     cursor: not-allowed; 
 }
 
-/* Estilo específico do botão Voltar */
+/* Botão de Voltar ao Início */
 .btn-return {
     background: transparent;
     color: var(--primary-orange);
@@ -127,30 +218,184 @@ body {
     background: var(--primary-orange);
     color: white;
 }
-/* Botão de Retorno Laranja */
-.btn-return {
-    display: block;
-    width: 100%;
-    background-color: transparent; /* Fundo transparente */
+
+/* =========================================
+   HISTÓRICO DE PEDIDOS
+========================================= */
+.history-section h2 {
+    margin-bottom: 20px;
     color: var(--primary-orange);
-    border: 2px solid var(--primary-orange); /* Borda laranja */
-    padding: 12px;
-    margin-top: 15px;
-    border-radius: 5px;
-    font-size: 1rem;
+}
+
+.history-card {
+    background: var(--card-bg);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.history-date {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    margin-bottom: 10px;
+}
+
+.history-items {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.history-total {
     font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.3s ease;
+    color: var(--primary-orange);
 }
 
-.btn-return:hover {
-    background-color: var(--primary-orange); /* Fica todo laranja ao passar o mouse */
-    color: white;
+.status-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #333;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
-.btn-primary:disabled { background: #555; cursor: not-allowed; }
+.status-badge.pendente { 
+    color: #f1c40f; 
+    border: 1px solid #f1c40f;
+}
 
+/* =========================================
+   RESPONSIVIDADE (CELULARES E TABLETS)
+========================================= */
 @media (max-width: 768px) {
-    .dashboard-main { grid-template-columns: 1fr; }
+    .dashboard-main { 
+        grid-template-columns: 1fr; /* Transforma em uma coluna só */
+    }
+    
+    .order-summary {
+        position: static; /* Tira o efeito fixo no celular */
+    }
+}
+/* =========================================
+   MODAL / POP-UP DE PAGAMENTO
+========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Fundo escuro transparente */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 10px;
+    border: 1px solid var(--primary-orange);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-pay {
+    background: #2a2a2a;
+    color: white;
+    border: 1px solid #444;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-pay:hover {
+    background: var(--primary-orange);
+    border-color: var(--primary-orange);
+}
+/* =========================================
+   NOVO DASHBOARD E BOTÕES GIGANTES
+========================================= */
+.dashboard-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.dash-btn {
+    background: var(--card-bg);
+    border: 2px solid #333;
+    border-radius: 15px;
+    padding: 40px 20px;
+    width: 250px;
+    color: white;
+    font-size: 1.2rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.dash-btn .icon { font-size: 3rem; }
+.dash-btn:hover { border-color: var(--primary-orange); transform: translateY(-5px); }
+
+/* =========================================
+   POP-UPS (MODAIS)
+========================================= */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+
+.modal-content-large {
+    background: var(--card-bg);
+    width: 95%; max-width: 1000px; height: 85vh;
+    border-radius: 10px; border: 1px solid var(--primary-orange);
+    padding: 30px; overflow-y: auto; position: relative;
+}
+
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+}
+
+.btn-close {
+    background: transparent; border: none; color: #ff4444;
+    font-size: 1.5rem; font-weight: bold; cursor: pointer;
+}
+
+.search-bar {
+    width: 100%; padding: 15px; margin-bottom: 20px;
+    background: #121212; border: 1px solid #444; border-radius: 5px;
+    color: white; font-family: 'Poppins', sans-serif; font-size: 1rem;
+}
+
+.grid-cards {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
 }

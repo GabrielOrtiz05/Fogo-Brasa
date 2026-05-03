@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Admin - Fogo & Brasa</title>
+    <link rel="stylesheet" href="/css/perfil-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="dashboard-header">
+        <div class="container header-flex">
+            <h1 class="logo">Master<span>Admin</span></h1>
+            <div class="user-info">
+                <span id="nome-admin" style="color: var(--primary-orange); font-weight: bold;">Carregando...</span>
+                <button onclick="logout()" class="btn-logout">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: 50px; text-align: center;">
+        <h2 style="margin-bottom: 30px;">O que você deseja gerenciar?</h2>
+        
+        <div class="dashboard-grid">
+            <button class="dash-btn" onclick="abrirModal('modal-pedidos')">
+                <span class="icon">🍔</span> Gestão de Pedidos
+            </button>
+            <button class="dash-btn" onclick="abrirModal('modal-financeiro')">
+                <span class="icon">💰</span> Caixa / Financeiro
+            </button>
+            <button class="dash-btn" onclick="abrirModal('modal-auditoria')">
+                <span class="icon">📋</span> Logs de Auditoria
+            </button>
+        </div>
+    </main>
+
+    <div id="modal-pedidos" class="modal-overlay" style="display: none;">
+        <div class="modal-content-large">
+            <div class="modal-header">
+                <h2>Gestão de Pedidos</h2>
+                <button class="btn-close" onclick="fecharModal('modal-pedidos')">X</button>
+            </div>
+            
+            <input type="text" id="pesquisa-pedidos" class="search-bar" placeholder="🔍 Pesquisar por Mesa ou Status..." onkeyup="filtrarPedidos()">
+            
+            <div id="painel-admin-pedidos" class="grid-cards">
+                <p class="empty-msg">Carregando pedidos...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-financeiro" class="modal-overlay" style="display: none;">
+        <div class="modal-content-large">
+            <div class="modal-header">
+                <h2>Financeiro / Caixa</h2>
+                <button class="btn-close" onclick="fecharModal('modal-financeiro')">X</button>
+            </div>
+            
+            <div class="dashboard-main" style="grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <div class="stat-card">
+                        <p>Total em Caixa (Hoje)</p>
+                        <h2 id="valor-caixa" style="color: #2ecc71;">R$ 0,00</h2>
+                    </div>
+                    <button onclick="fecharCaixa()" class="btn-primary" style="background: #2ecc71; border-color: #2ecc71;">Fechar Caixa</button>
+                </div>
+                <div>
+                    <h3>Últimos Pagamentos</h3>
+                    <div id="lista-pagamentos" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-auditoria" class="modal-overlay" style="display: none;">
+        <div class="modal-content-large">
+            <div class="modal-header">
+                <h2>Registros de Alterações</h2>
+                <button class="btn-close" onclick="fecharModal('modal-auditoria')">X</button>
+            </div>
+            
+            <input type="text" id="pesquisa-auditoria" class="search-bar" placeholder="🔍 Pesquisar por Ação ou Nome..." onkeyup="filtrarAuditoria()">
+            
+            <div id="painel-auditoria" style="display: flex; flex-direction: column; gap: 10px;">
+                <p class="empty-msg">Carregando registros...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-pagamento" class="modal-overlay" style="display: none; z-index: 2000;">
+        <div class="modal-content">
+            <h3 style="color: var(--primary-orange); margin-bottom: 10px;">Finalizar Pagamento</h3>
+            <div class="modal-buttons">
+                <button onclick="processarPagamento('Dinheiro')" class="btn-pay">💵 Dinheiro</button>
+                <button onclick="processarPagamento('Cartão')" class="btn-pay">💳 Cartão</button>
+                <button onclick="processarPagamento('Pix')" class="btn-pay">📱 Pix</button>
+            </div>
+            <button onclick="fecharModal('modal-pagamento')" class="btn-return" style="margin-top: 15px;">Cancelar</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/script/admin-script.js"></script>
+</body>
+</html>

@@ -1,10 +1,13 @@
-// Interatividade do Menu Mobile
+// Interatividade do Menu Mobile (COM PROTEÇÃO)
 const menuToggle = document.getElementById('mobile-menu');
 const navList = document.querySelector('.nav-list');
 
-menuToggle.addEventListener('click', () => {
-    navList.classList.toggle('active');
-});
+// O 'if' verifica se o menu existe nesta página antes de tentar adicionar o evento
+if (menuToggle && navList) {
+    menuToggle.addEventListener('click', () => {
+        navList.classList.toggle('active');
+    });
+}
 
 // Ação do botão de reserva
 function fazerReserva() {
@@ -18,6 +21,9 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 async function atualizarBarraNavegacao() {
     const authArea = document.getElementById('auth-area');
+    
+    // TRAVA DE SEGURANÇA: Se não existir a área de login nesta página, cancela a função silenciosamente
+    if (!authArea) return; 
     
     // 1. Verifica se tem um usuário logado
     const { data: { user } } = await supabaseClient.auth.getUser();
