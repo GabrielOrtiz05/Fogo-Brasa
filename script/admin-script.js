@@ -1,52 +1,44 @@
-const supabaseUrl = 'https://hzzfgarpeqohezdxidgr.supabase.co';
-const supabaseKey = 'sb_publishable_EMnwWRkG9TbuMrYNyNewWQ_w7uN4JQz'; 
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+// script/admin-script.js
+// Antes: falava direto com supabaseClient e montava um mapa de nomes de usuário
+// na mão (carregarNomesUsuarios) só pra exibir quem fez cada ação na auditoria.
+// Agora: usa a sessão salva pelo login e chama /api/*, que já devolve os nomes
+// prontos (via JOIN) e já cuida de auditoria/transação no servidor.
 
-let adminId = null;
+let usuarioAtual = null;
 let todosPedidos = [];
 let todosLogs = [];
-let mapUsuarios = {}; // Guarda os nomes dos usuários para a auditoria
 
 // --- CONTROLE DE MODAIS ---
 function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
 function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
 
 // --- INICIALIZAÇÃO ---
-async function verificarAcessoAdmin() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) { window.location.href = "login.html"; return; }
+function verificarAcessoAdmin() {
+    usuarioAtual = verificarAcesso(["admin"]); // helper do auth.js, já redireciona se não for admin
 
-    const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
-    if (!profile || profile.role !== 'admin') { window.location.href = "perfil.html"; return; }
+    if (!usuarioAtual) return;
 
-    adminId = user.id;
-    document.getElementById('nome-admin').textContent = `Admin: ${profile.nome_completo.split(' ')[0]}`;
-    
-    await carregarNomesUsuarios();
+    document.getElementById('nome-admin').textContent = `Admin: ${usuarioAtual.nome_completo.split(' ')[0]}`;
+
     carregarPedidosMaster();
     carregarFinanceiro();
     carregarAuditoria();
 }
 
-// Busca todos os nomes do banco para associar na auditoria
-async function carregarNomesUsuarios() {
-    const { data: profiles } = await supabaseClient.from('profiles').select('id, nome_completo');
-    if (profiles) {
-        profiles.forEach(p => mapUsuarios[p.id] = p.nome_completo.split(' ')[0]);
-    }
-}
-
 // --- GESTÃO DE PEDIDOS & PESQUISA ---
 async function carregarPedidosMaster() {
-    const { data: pedidos } = await supabaseClient.from('pedidos').select('*').neq('status', 'Finalizado').order('criado_em', { ascending: false });
-    todosPedidos = pedidos || [];
+    try {
+        todosPedidos = await apiFetch('/pedidos');
+    } catch (err) {
+        todosPedidos = [];
+    }
     renderizarPedidos(todosPedidos);
 }
 
 function filtrarPedidos() {
     const termo = document.getElementById('pesquisa-pedidos').value.toLowerCase();
-    const filtrados = todosPedidos.filter(p => 
-        (p.mesa && p.mesa.toLowerCase().includes(termo)) || 
+    const filtrados = todosPedidos.filter(p =>
+        (p.mesa && p.mesa.toLowerCase().includes(termo)) ||
         p.status.toLowerCase().includes(termo) ||
         p.id.toLowerCase().includes(termo)
     );
@@ -59,27 +51,38 @@ function renderizarPedidos(lista) {
 
     container.innerHTML = lista.map(p => {
         const itensNomes = p.itens.map(i => i.nome).join('<br> • ');
+        // node-postgres devolve NUMERIC como string, então convertemos antes do toFixed
+        const totalPedido = Number(p.total);
+
         return `
         <div class="history-card">
             <strong>Mesa ${p.mesa || 'Balcão'}</strong>
             <div style="background: #121212; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 0.85rem;">• ${itensNomes}</div>
-            <p style="font-weight: bold; color: var(--primary-orange); margin-bottom: 10px;">Total: R$ ${p.total.toFixed(2)}</p>
-            
+            <p style="font-weight: bold; color: var(--primary-orange); margin-bottom: 10px;">Total: R$ ${totalPedido.toFixed(2)}</p>
+
             <select onchange="atualizarStatusAdmin('${p.id}', this.value)" style="width: 100%; margin-bottom: 10px; padding: 8px; background: #333; color: white; border: none;">
                 <option value="Pendente" ${p.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
                 <option value="Preparando" ${p.status === 'Preparando' ? 'selected' : ''}>Preparando</option>
                 <option value="Entregue" ${p.status === 'Entregue' ? 'selected' : ''}>Entregue</option>
             </select>
-            
-            <button onclick="abrirModalPagamentoAdmin('${p.id}', ${p.total})" class="btn-primary" style="height: 35px; font-size: 0.85rem;">Receber Pagamento</button>
+
+            <button onclick="abrirModalPagamentoAdmin('${p.id}', ${totalPedido})" class="btn-primary" style="height: 35px; font-size: 0.85rem;">Receber Pagamento</button>
         </div>`;
     }).join('');
 }
 
 async function atualizarStatusAdmin(id, status) {
-    await supabaseClient.from('pedidos').update({ status: status, garcom_id: adminId }).eq('id', id);
-    registrarAuditoria('Status', `Mudou pedido ${id.substring(0,6)} para ${status}`);
-    carregarPedidosMaster();
+    try {
+        // A rota já vincula o admin como responsável e registra a auditoria sozinha
+        await apiFetch(`/pedidos/${id}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status }),
+        });
+        carregarPedidosMaster();
+        carregarAuditoria(); // mantém o log em tempo real, como no comportamento original
+    } catch (err) {
+        alert("Erro ao atualizar status: " + err.message);
+    }
 }
 
 // --- PAGAMENTOS ---
@@ -92,39 +95,56 @@ function abrirModalPagamentoAdmin(id, valor) {
 
 async function processarPagamento(metodo) {
     fecharModal('modal-pagamento');
-    await supabaseClient.from('pagamentos').insert([{ pedido_id: pedidoPendenteId, valor: pedidoPendenteValor, metodo: metodo }]);
-    await supabaseClient.from('pedidos').update({ status: 'Finalizado' }).eq('id', pedidoPendenteId);
-    
-    registrarAuditoria('Pagamento', `Recebeu R$ ${pedidoPendenteValor} via ${metodo}.`);
-    alert("Pagamento registrado com sucesso!");
-    carregarPedidosMaster(); carregarFinanceiro();
+
+    try {
+        // A rota faz insert do pagamento + status='Finalizado' + auditoria,
+        // tudo dentro de uma transação no servidor.
+        await apiFetch('/pagamentos', {
+            method: 'POST',
+            body: JSON.stringify({ pedido_id: pedidoPendenteId, valor: pedidoPendenteValor, metodo }),
+        });
+
+        alert("Pagamento registrado com sucesso!");
+        carregarPedidosMaster();
+        carregarFinanceiro();
+        carregarAuditoria();
+    } catch (err) {
+        alert("Erro ao processar pagamento: " + err.message);
+    }
 }
 
 async function carregarFinanceiro() {
-    const hoje = new Date().toISOString().split('T')[0];
-    const { data: pags } = await supabaseClient.from('pagamentos').select('*').gte('criado_em', hoje);
-    let total = 0, html = '';
-    
-    (pags || []).forEach(p => {
-        total += p.valor;
-        html += `<div class="history-card" style="padding: 10px; margin-bottom: 5px;">${p.metodo} | <strong>R$ ${p.valor.toFixed(2)}</strong></div>`;
-    });
+    let resultado;
+    try {
+        resultado = await apiFetch('/pagamentos/hoje');
+    } catch (err) {
+        resultado = { total: 0, pagamentos: [] };
+    }
 
-    document.getElementById('valor-caixa').textContent = `R$ ${total.toFixed(2)}`;
+    const html = resultado.pagamentos.map(p =>
+        `<div class="history-card" style="padding: 10px; margin-bottom: 5px;">${p.metodo} | <strong>R$ ${Number(p.valor).toFixed(2)}</strong></div>`
+    ).join('');
+
+    document.getElementById('valor-caixa').textContent = `R$ ${Number(resultado.total).toFixed(2)}`;
     document.getElementById('lista-pagamentos').innerHTML = html || '<p>Sem vendas hoje.</p>';
 }
 
-// --- AUDITORIA & PESQUISA COM NOME ---
+// --- AUDITORIA & PESQUISA ---
 async function carregarAuditoria() {
-    const { data: logs } = await supabaseClient.from('auditoria').select('*').order('criado_em', { ascending: false }).limit(50);
-    todosLogs = logs || [];
+    try {
+        // /api/auditoria já devolve nome_responsavel pronto (via JOIN no servidor),
+        // então não precisamos mais montar um mapa de nomes na mão.
+        todosLogs = await apiFetch('/auditoria');
+    } catch (err) {
+        todosLogs = [];
+    }
     renderizarAuditoria(todosLogs);
 }
 
 function filtrarAuditoria() {
     const termo = document.getElementById('pesquisa-auditoria').value.toLowerCase();
     const filtrados = todosLogs.filter(l => {
-        const nomeResp = mapUsuarios[l.usuario_id] || 'Desconhecido';
+        const nomeResp = l.nome_responsavel || 'Desconhecido';
         return l.acao.toLowerCase().includes(termo) || nomeResp.toLowerCase().includes(termo) || l.detalhes.toLowerCase().includes(termo);
     });
     renderizarAuditoria(filtrados);
@@ -135,10 +155,9 @@ function renderizarAuditoria(lista) {
     if (lista.length === 0) { container.innerHTML = '<p class="empty-msg">Nenhum log encontrado.</p>'; return; }
 
     container.innerHTML = lista.map(l => {
-        // Usa o mapa para transformar o ID criptografado no Nome real da pessoa
-        const nomeResponsavel = mapUsuarios[l.usuario_id] || 'Usuário Deletado';
+        const nomeResponsavel = l.nome_responsavel || 'Usuário Deletado';
         const data = new Date(l.criado_em).toLocaleString('pt-BR');
-        
+
         return `
         <div style="background: #1a1a1a; padding: 15px; border-radius: 5px; border-left: 4px solid var(--primary-orange);">
             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -151,13 +170,8 @@ function renderizarAuditoria(lista) {
     }).join('');
 }
 
-async function registrarAuditoria(acao, detalhes) {
-    await supabaseClient.from('auditoria').insert([{ usuario_id: adminId, acao, detalhes }]);
-    carregarAuditoria(); // Atualiza a lista em tempo real
-}
-
-async function logout() {
-    await supabaseClient.auth.signOut();
+function logout() {
+    limparSessao();
     window.location.href = "login.html";
 }
 

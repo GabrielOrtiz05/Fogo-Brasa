@@ -1,14 +1,10 @@
-// 1. Configuração do Supabase
-const supabaseUrl = 'https://hzzfgarpeqohezdxidgr.supabase.co';
-const supabaseKey = 'sb_publishable_EMnwWRkG9TbuMrYNyNewWQ_w7uN4JQz'; 
+// script/login-script.js
+// Antes: chamava supabaseClient.auth.signInWithPassword(...)
+// Agora: chama a API própria em /api/auth/login
 
-// MUDANÇA 1: Alteramos de 'supabase' para 'supabaseClient'
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-// 2. Lógica de Login
-document.getElementById('loginForm').addEventListener('submit', async function(event) {
+document.getElementById('loginForm').addEventListener('submit', async function (event) {
     event.preventDefault(); // Evita recarregar a página
-    
+
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
     const btnLogin = document.querySelector('.btn-login');
@@ -18,21 +14,25 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     btnLogin.disabled = true;
 
     try {
-        // MUDANÇA 2: Usamos 'supabaseClient' para chamar a autenticação
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: senha,
+        const resposta = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha }),
         });
 
-        if (error) {
-            // Se errar a senha ou o e-mail não existir
-            alert('Erro ao fazer login: ' + error.message);
-        } else {
-            // Sucesso!
-            alert('Login efetuado com sucesso!');
-            // Redireciona o usuário para a página inicial da churrascaria
-            window.location.href = "index.html"; 
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            // Ex: "Email ou senha inválidos."
+            alert('Erro ao fazer login: ' + (dados.error || 'tente novamente.'));
+            return;
         }
+
+        // Sucesso! Guarda o token e o usuário, depois manda pra tela certa do papel dele
+        salvarSessao(dados.usuario, dados.token);
+        alert('Login efetuado com sucesso!');
+        redirecionarPorRole(dados.usuario.role);
+
     } catch (err) {
         console.error("Erro inesperado:", err);
         alert('Ocorreu um erro no servidor. Tente novamente mais tarde.');
