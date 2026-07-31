@@ -15,7 +15,7 @@ import pagamentosRoutes from "./routes/pagamentos.routes";
 import profilesRoutes from "./routes/profiles.routes";
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "https://fogo-brasa.vercel.app" }));
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;

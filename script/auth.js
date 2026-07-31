@@ -3,7 +3,7 @@
 // cadastro-script.js e (nos próximos passos) pelas páginas de perfil, garçom e admin.
 // Substitui o supabaseClient: agora falamos direto com a API própria em /api/*.
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://fogo-brasa.onrender.com/api";
 
 // --- Sessão (guardada no localStorage no lugar da sessão do Supabase) ---
 
