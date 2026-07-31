@@ -14,49 +14,35 @@ function fazerReserva() {
     alert("Obrigado pelo interesse! Nosso sistema de reservas online estará disponível em breve. Por favor, ligue para (11) 99999-9999 para garantir sua mesa.");
 }
 
-// Configuração do Supabase
-const supabaseUrl = 'https://hzzfgarpeqohezdxidgr.supabase.co';
-const supabaseKey = 'sb_publishable_EMnwWRkG9TbuMrYNyNewWQ_w7uN4JQz'; 
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-async function atualizarBarraNavegacao() {
+// Antes: consultava o Supabase (auth.getUser() + tabela profiles) pra montar a barra.
+// Agora: o próprio login já guardou o usuário no localStorage (auth.js), então
+// não precisamos de nenhuma chamada de rede só pra desenhar a barra de navegação.
+function atualizarBarraNavegacao() {
     const authArea = document.getElementById('auth-area');
-    
+
     // TRAVA DE SEGURANÇA: Se não existir a área de login nesta página, cancela a função silenciosamente
-    if (!authArea) return; 
-    
-    // 1. Verifica se tem um usuário logado
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!authArea) return;
 
-    if (user) {
-        // 2. Se logado, busca o nome no perfil
-        const { data: profile } = await supabaseClient
-            .from('profiles')
-            .select('nome_completo')
-            .eq('id', user.id)
-            .maybeSingle();
+    const usuario = getUsuarioLogado(); // helper do auth.js
 
-        // 3. Extrai o primeiro nome de forma segura
-        const nomeCompleto = profile?.nome_completo;
-        const primeiroNome = nomeCompleto ? nomeCompleto.trim().split(' ')[0] : 'Amigo';
+    if (usuario) {
+        const primeiroNome = usuario.nome_completo ? usuario.nome_completo.trim().split(' ')[0] : 'Amigo';
 
-        // 4. Exibe o nome e link para o Painel/Pedido
         authArea.innerHTML = `
             <span class="user-name">Olá, ${primeiroNome}</span>
             <a href="perfil.html" class="btn-auth">Fazer Pedido</a>
             <button onclick="fazerLogout()" class="btn-logout-small">Sair</button>
         `;
     } else {
-        // 5. Se não logado, exibe botão de Login
         authArea.innerHTML = `
             <a href="login.html" class="btn-auth">Entrar / Cadastro</a>
         `;
     }
 }
 
-async function fazerLogout() {
-    await supabaseClient.auth.signOut();
-    window.location.reload(); // Recarrega a página para atualizar a barra
+function fazerLogout() {
+    limparSessao(); // helper do auth.js
+    window.location.reload();
 }
 
 // Chama a função assim que a página carrega
