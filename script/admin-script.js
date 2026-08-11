@@ -118,7 +118,7 @@ async function carregarFinanceiro() {
     try {
         resultado = await apiFetch('/pagamentos/hoje');
     } catch (err) {
-        resultado = { total: 0, pagamentos: [] };
+        resultado = { total: 0, pagamentos: [], totalSangria: 0, saldoAtual: 0, caixaFechado: false };
     }
 
     const html = resultado.pagamentos.map(p =>
@@ -126,15 +126,115 @@ async function carregarFinanceiro() {
     ).join('');
 
     document.getElementById('valor-caixa').textContent = `R$ ${Number(resultado.total).toFixed(2)}`;
+    document.getElementById('valor-sangria').textContent = `R$ ${Number(resultado.totalSangria).toFixed(2)}`;
+    document.getElementById('valor-saldo').textContent = `R$ ${Number(resultado.saldoAtual).toFixed(2)}`;
     document.getElementById('lista-pagamentos').innerHTML = html || '<p>Sem vendas hoje.</p>';
+
+    const statusEl = document.getElementById('status-caixa');
+    const btnFechar = document.getElementById('btn-fechar-caixa');
+    const btnSangria = document.getElementById('btn-sangria');
+
+    if (resultado.caixaFechado) {
+        statusEl.textContent = '🔒 Caixa já fechado hoje.';
+        statusEl.style.color = '#ff4444';
+        btnFechar.disabled = true;
+        btnFechar.style.opacity = '0.5';
+        btnSangria.disabled = true;
+        btnSangria.style.opacity = '0.5';
+    } else {
+        statusEl.textContent = '🔓 Caixa aberto.';
+        statusEl.style.color = '#2ecc71';
+        btnFechar.disabled = false;
+        btnFechar.style.opacity = '1';
+        btnSangria.disabled = false;
+        btnSangria.style.opacity = '1';
+    }
 }
 
-async function fecharCaixa() {
-    if (!confirm("Tem certeza que deseja fechar o caixa?")) return;
+// --- SANGRIA AVULSA (retira dinheiro do caixa sem fechar o dia) ---
+async function fazerSangria() {
+    const valorInformado = prompt("Valor da sangria (R$):");
+    if (!valorInformado) return;
+
+    const valor = Number(valorInformado.replace(',', '.'));
+    if (isNaN(valor) || valor <= 0) {
+        alert("Valor inválido.");
+        return;
+    }
+
+    const motivo = prompt("Motivo da sangria (opcional):") || undefined;
 
     try {
-        await apiFetch('/pagamentos/fechar-caixa', { method: 'POST' });
+        await apiFetch('/pagamentos/sangria', {
+            method: 'POST',
+            body: JSON.stringify({ valor, motivo }),
+        });
+        alert("Sangria registrada com sucesso!");
+        carregarFinanceiro();
+        carregarAuditoria();
+    } catch (err) {
+        alert("Erro ao registrar sangria: " + err.message);
+    }
+}
+
+// --- FECHAMENTO DE CAIXA (com detalhamento dos pedidos do dia) ---
+async function abrirFechamentoCaixa() {
+    const container = document.getElementById('lista-pedidos-fechamento');
+    container.innerHTML = '<p class="empty-msg">Carregando pedidos...</p>';
+    document.getElementById('input-sangria-final').value = '';
+    document.getElementById('input-motivo-sangria-final').value = '';
+
+    abrirModal('modal-fechamento');
+
+    let pedidos;
+    try {
+        pedidos = await apiFetch('/pedidos/finalizados-hoje');
+    } catch (err) {
+        container.innerHTML = '<p class="empty-msg">Erro ao carregar pedidos.</p>';
+        return;
+    }
+
+    if (!pedidos || pedidos.length === 0) {
+        container.innerHTML = '<p class="empty-msg">Nenhum pedido finalizado hoje.</p>';
+        return;
+    }
+
+    container.innerHTML = pedidos.map(p => {
+        const itensNomes = p.itens.map(i => `${i.nome} (R$ ${Number(i.preco).toFixed(2)})`).join('<br> • ');
+        const totalPedido = Number(p.total);
+        return `
+            <div class="history-card" style="padding: 10px; margin-bottom: 8px;">
+                <strong>Mesa ${p.mesa || 'Balcão'}</strong> - ${p.nome_cliente || 'Cliente'}
+                <div style="font-size: 0.85rem; margin: 5px 0;">• ${itensNomes}</div>
+                <p style="font-weight: bold; color: var(--primary-orange);">Total: R$ ${totalPedido.toFixed(2)}</p>
+            </div>`;
+    }).join('');
+}
+
+async function confirmarFechamentoCaixa() {
+    if (!confirm("Confirma o fechamento do caixa de hoje? Essa ação não pode ser desfeita.")) return;
+
+    const valorSangriaRaw = document.getElementById('input-sangria-final').value;
+    const motivoSangriaFinal = document.getElementById('input-motivo-sangria-final').value || undefined;
+
+    const body = {};
+    if (valorSangriaRaw) {
+        const valorSangria = Number(valorSangriaRaw);
+        if (isNaN(valorSangria) || valorSangria < 0) {
+            alert("Valor de sangria inválido.");
+            return;
+        }
+        body.valor_sangria = valorSangria;
+        body.motivo_sangria = motivoSangriaFinal;
+    }
+
+    try {
+        await apiFetch('/pagamentos/fechar-caixa', {
+            method: 'POST',
+            body: JSON.stringify(body),
+        });
         alert("Caixa fechado com sucesso!");
+        fecharModal('modal-fechamento');
         carregarFinanceiro();
         carregarAuditoria();
     } catch (err) {

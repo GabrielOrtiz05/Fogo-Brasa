@@ -76,6 +76,24 @@ router.get("/ativos", autenticar, autorizar("garcom", "admin"), async (req: Requ
   }
 });
 
+// GET /api/pedidos/finalizados-hoje - admin confere itens/preços dos pedidos já pagos
+// hoje, usado na tela de confirmação antes de fechar o caixa (abrirFechamentoCaixa())
+router.get("/finalizados-hoje", autenticar, autorizar("admin"), async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(
+      `SELECT p.*, pr.nome_completo AS nome_cliente
+       FROM pedidos p
+       LEFT JOIN profiles pr ON pr.id = p.user_id
+       WHERE p.status = 'Finalizado' AND p.criado_em >= CURRENT_DATE
+       ORDER BY p.criado_em ASC`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erro ao buscar pedidos finalizados de hoje:", err);
+    res.status(500).json({ error: "Erro no servidor ao buscar pedidos finalizados." });
+  }
+});
+
 // GET /api/pedidos - admin vê todos os pedidos não finalizados (admin-script.js -> carregarPedidosMaster)
 router.get("/", autenticar, autorizar("admin"), async (req: Request, res: Response) => {
   try {

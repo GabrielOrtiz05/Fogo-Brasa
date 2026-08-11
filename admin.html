@@ -60,16 +60,51 @@
             <div class="dashboard-main" style="grid-template-columns: 1fr 1fr; gap: 30px;">
                 <div>
                     <div class="stat-card">
-                        <p>Total em Caixa (Hoje)</p>
+                        <p>Total em Vendas (Hoje)</p>
                         <h2 id="valor-caixa" style="color: #2ecc71;">R$ 0,00</h2>
                     </div>
-                    <button onclick="fecharCaixa()" class="btn-primary" style="background: #2ecc71; border-color: #2ecc71;">Fechar Caixa</button>
+                    <div class="stat-card">
+                        <p>Sangrias (Hoje)</p>
+                        <h2 id="valor-sangria" style="color: #e67e22;">R$ 0,00</h2>
+                    </div>
+                    <div class="stat-card">
+                        <p>Saldo Atual em Caixa</p>
+                        <h2 id="valor-saldo" style="color: #3498db;">R$ 0,00</h2>
+                    </div>
+                    <p id="status-caixa" style="margin: 10px 0; font-weight: bold;"></p>
+                    <button id="btn-sangria" onclick="fazerSangria()" class="btn-primary" style="background: #e67e22; border-color: #e67e22; margin-bottom: 10px; width: 100%;">Fazer Sangria</button>
+                    <button id="btn-fechar-caixa" onclick="abrirFechamentoCaixa()" class="btn-primary" style="background: #2ecc71; border-color: #2ecc71; width: 100%;">Fechar Caixa</button>
                 </div>
                 <div>
                     <h3>Últimos Pagamentos</h3>
                     <div id="lista-pagamentos" style="margin-top: 15px;"></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="modal-fechamento" class="modal-overlay" style="display: none; z-index: 2000;">
+        <div class="modal-content-large">
+            <div class="modal-header">
+                <h2>Confirmar Fechamento de Caixa</h2>
+                <button class="btn-close" onclick="fecharModal('modal-fechamento')">X</button>
+            </div>
+
+            <h3>Pedidos finalizados hoje (confira itens e valores)</h3>
+            <div id="lista-pedidos-fechamento" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+                <p class="empty-msg">Carregando pedidos...</p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label for="input-sangria-final">Sangria final (opcional, R$)</label>
+                <input type="number" id="input-sangria-final" step="0.01" min="0" placeholder="0.00" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label for="input-motivo-sangria-final">Motivo da sangria (opcional)</label>
+                <input type="text" id="input-motivo-sangria-final" placeholder="Ex: Retirada para depósito" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+
+            <button onclick="confirmarFechamentoCaixa()" class="btn-primary" style="background: #2ecc71; border-color: #2ecc71; width: 100%;">Confirmar Fechamento</button>
         </div>
     </div>
 
