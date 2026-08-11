@@ -129,6 +129,18 @@ async function carregarFinanceiro() {
     document.getElementById('lista-pagamentos').innerHTML = html || '<p>Sem vendas hoje.</p>';
 }
 
+async function fecharCaixa() {
+    if (!confirm("Tem certeza que deseja fechar o caixa?")) return;
+
+    try {
+        await apiFetch('/pagamentos/fechar-caixa', { method: 'POST' });
+        alert("Caixa fechado com sucesso!");
+        carregarFinanceiro();
+        carregarAuditoria();
+    } catch (err) {
+        alert("Erro ao fechar caixa: " + err.message);
+    }
+}
 // --- AUDITORIA & PESQUISA ---
 async function carregarAuditoria() {
     try {
